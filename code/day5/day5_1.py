@@ -1,19 +1,18 @@
-#[1518-11-01 00:00] Guard #10 begins shift
-#[1518-11-01 00:05] falls asleep
-#[1518-11-01 00:25] wakes up
-molecules = []
+from string import ascii_lowercase
+import re
+
+polymer =""
 with open("../../data/5.txt", "r") as f:
     for line in f:
-        for c in line:
-            molecules.append(c)
+        polymer = line
 
-x = 0
-while x < len(molecules)-1:
-    if molecules[x].lower() == molecules[x+1].lower() and molecules[x] <> molecules[x+1]:
-        molecules.pop(x)
-        molecules.pop(x)
-        x = -1
-    x += 1
+length = len(polymer)
+newLength = 0
+while length <> newLength:
+    length = len(polymer)
+    for x in ascii_lowercase:
+        polymer = re.sub("("+x+x.upper()+"|"+x.upper()+x+")", "", polymer)
+    newLength = len(polymer)
         
-print len(molecules)
+print len(polymer)
 

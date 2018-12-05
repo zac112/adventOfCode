@@ -1,32 +1,28 @@
 from string import ascii_lowercase
+import re
 
-#[1518-11-01 00:00] Guard #10 begins shift
-#[1518-11-01 00:05] falls asleep
-#[1518-11-01 00:25] wakes up
-molecules_orig = []
+polymer = ""
 with open("../../data/5.txt", "r") as f:
     for line in f:
-        for c in line:
-            molecules_orig.append(c)
+        polymer = line
 
-removables = [x for x in ascii_lowercase]
 lengths = []
-molecules = []
 
-def react(molecules):
-    x = 0
-    while x < len(molecules)-1:
-        if molecules[x].lower() == molecules[x+1].lower() and molecules[x] <> molecules[x+1]:
-            molecules.pop(x)
-            molecules.pop(x)
-            x = -1
-        x += 1
+def react(polymer):
+    length = len(polymer)
+    newLength = 0
+    while length <> newLength:
+        length = len(polymer)
+        for x in ascii_lowercase:
+            polymer = re.sub("("+x+x.upper()+"|"+x.upper()+x+")", "", polymer)
+        newLength = len(polymer)
+    return polymer
 
-for removable in removables:    
-    molecules = [x for x in molecules_orig if x.lower() <> removable]
-    react(molecules)
-    lengths.append((removable,len(molecules)))
-    print removable, len(molecules)
+for x in ascii_lowercase:    
+    molecules = re.sub(x+"|"+x.upper(), "", polymer)
+    molecules = react(molecules)
+    lengths.append((x,len(molecules)))
+    print x, len(molecules)
         
 lengths.sort(key=lambda a : a[1], reverse=False)
 
