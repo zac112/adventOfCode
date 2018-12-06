@@ -1,67 +1,13 @@
+from collections import deque
+
 coords = []
 with open("../../data/6.txt","r") as f:
     for line in f :
         coord = line.split(",");
         coords.append((int(coord[0]),int(coord[1])))
 
+#test data
 #coords = [(1, 1),(1, 6),(8, 3),(3, 4),(5, 5),(8, 9)]
-
-def printArea(area):
-    for x in range(len(area)):
-        print (area[x])
-        
-def fillArea(pos, area, name):    
-    #optimize if I ever have time: make a flood fill
-    for x in range(len(area)):
-        for y in range(len(area[x])):
-            area[x][y].append( (name, abs(x-pos[0])+abs(y-pos[1]) ) )
-
-def sortAndMarkArea(area):
-    for x in range(len(area)):
-        for y in range(len(area[x])):
-            area[x][y].sort(key=lambda a : a[1])
-            if(len(area[x][y])>1 and area[x][y][0][1] == area[x][y][1][1]):
-                area[x][y][0] = (-1,0)
-    print ("sorted!")
-
-def findInfinites(area):
-    result = set([])
-    for x in range(len(area)):
-        result.add(area[x][0][0][0])
-        result.add(area[x][len(area[x])-1][0][0])
-        if(sum(z[1] for z in area[x][0]) >= 10000):
-            print ("too small")
-        if(sum(z[1] for z in area[x][area[x][len(area[x])-1]]) >= 10000):
-            print ("too small")
-        for y in range(len(area[x])):
-            result.add(area[0][y][0][0])
-            result.add(area[len(area)-1][y][0][0])
-            if(sum(z[1] for z in area[x][0]) >= 10000):
-                print ("too small")
-            if(sum(z[1] for z in area[x][area[x][len(area[x])-1]]) >= 10000):
-                print ("too small")
-    print ("infinites:", result)
-    return result
-
-def findLargestArea(area, infiniteAreas):
-    areas = {}
-    for x in range(len(area)):
-        for y in range(len(area[x])):
-            cell = area[x][y]
-            #cell: list of tuples: (name, distance)
-            if cell[0][0] in infiniteAreas:
-                continue
-            if cell[0][0] not in areas:
-                areas[cell[0][0]] = 1
-            else:
-                areas[cell[0][0]] += 1
-
-    #id, distance
-    maxArea = (0,0)
-    for x in areas:
-        if areas[x] > maxArea[1]:
-            maxArea = (x, areas[x])
-    return maxArea
 
 #reduce the infine coordinates to finite coordinates by calculating bounds
 #the coordinate points on the bounds MUST have infinite size
@@ -71,25 +17,34 @@ xmax = coords[len(coords)-1][0]
 coords.sort(key=lambda a : a[1])
 ymin = coords[0][1]
 ymax = coords[len(coords)-1][1]
-xsize = xmax-xmin+1
-ysize = ymax-ymin+1
+xsize = xmax-xmin
+ysize = ymax-ymin
 
-modCoords = [(x[0]-xmin, x[1]-ymin) for x in coords]
+#since safe area is a circle with radius 10000, the center point of our finite bounds must overlap with all circles
+coordsToCheck = deque([(xsize/2, ysize/2)])
+coordsChecked = set([])
+#if center point is not safe, safe area size is 0
+safeAreaSize = 1
+safeDistance = 10000
 
-#area is [x:int][y:list of closest points as tuple->name, minDistance]
+while len(coordsToCheck) > 0:    
+    c = coordsToCheck.popleft()
+    coordsChecked.add(c)
 
-safeAreaSize = 0
-for x in range (-10000,10000):
-    if x%1000 == 0:
-        print (x)
-    for y in range(-10000, 10000):
-        distance = 0
-        for c in modCoords:
-            distance += abs(x-c[0])+abs(y-c[1])
-            if distance > 10000:
-                break
+    for x in range(-1,2):
+        for y in range(-1,2):
+            newX = c[0]+x
+            newY = c[1]+y
+            if (newX, newY) not in coordsChecked:
+                distance = 0
+                for otherC in coords:
+                    distance += abs(newX-otherC[0])+abs(newY-otherC[1])                
+                if distance < safeDistance:
+                    if (newX,newY) not in coordsToCheck:
+                        coordsToCheck.append((newX,newY))
+                        safeAreaSize += 1
+                else:
+                    coordsChecked.add((newX,newY))
 
-        if distance < 10000:
-            safeAreaSize += 1
-
-print (safeAreaSize)
+    
+print ("Answer:",safeAreaSize)
