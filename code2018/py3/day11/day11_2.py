@@ -16,17 +16,24 @@ xCoord = 0
 yCoord = 0
 maxSize = 0
 
-for x in range(len(grid)):
-    for y in range(len(grid)):
-        if (y%100 == 0):
-            print (x,y)
-        for size in range(min(len(grid)-x-1, len(grid)-y-1)):
-            gridSum = 0
-            for x1 in range( size ):            
-                for y1 in range( size ):
-                    gridSum += grid[x+x1][y+y1]
+#{ (x,y, size) -> value }
+preCalculated = {}
 
-            if gridSum > maxGridSum:            
+for x in range(len(grid)-1, -1, -1):
+    for y in range(len(grid)-1, -1, -1):
+        if (y%100 == 0):
+            print (x,y,"   \t", maxSize,":",maxGridSum)
+        for size in range( min(len(grid)-x, len(grid)-y) ):
+            if(size == 0):
+                gridSum = grid[x][y]
+            else:
+                gridSum = grid[x][y] + preCalculated[(x+1,y+1,size-1)]
+            for x1 in range(1,  size+1 ): 
+                gridSum += grid[x][y+x1] + grid[x+x1][y]
+
+            preCalculated[(x,y, size)] = gridSum
+            
+            if gridSum > maxGridSum:
                 maxGridSum = gridSum
                 xCoord = x+1
                 yCoord = y+1
