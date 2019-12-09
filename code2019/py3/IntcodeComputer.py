@@ -4,6 +4,7 @@ class Computer:
         self.pointer = 0
         self.onFinished = onFinished
         self.onOutput = onOutput
+        self.relative_base = 0
         
         self.input_data = {
             "data": program_input,
@@ -17,11 +18,13 @@ class Computer:
             5:self.jit,
             6:self.jif,
             7:self.lt,
-            8:self.eq        
+            8:self.eq,
+            9:self.setRelativeBase
             }
         self.readModes = {
             0: lambda a: self.access(a),
-            1: lambda a: a
+            1: lambda a: a,
+            2: lambda a: self.relative_base+self.access(a)
         }
         self.paramCount={
             self.add:3,
@@ -31,73 +34,69 @@ class Computer:
             self.jit:2,
             self.jif:2,
             self.lt:3,
-            self.eq:3
+            self.eq:3,
+            self.setRelativeBase:1
             }
         self.data = [[int(x)] for x in data]
 
-    def read(self, indexes):
+    def read(self, i1):
         if self.input_data["data"] == None:
-            val = int(input(str(indexes)+"Input value:"))
+            val = int(input("Input value:"))
         else:
             val = self.input_data["data"][self.input_data["index"]]
             self.input_data["index"] += 1
             
-        self.write(indexes[0],val)
-        self.pointer += 2
+        self.write(i1,val)
 
-    def output(self, indexes):
-        self.output = self.access(indexes[0])
-        self.pointer += 2
+    def output(self, i1):
+        #print("accessing index",i1)
+        self.output = self.access(i1)
         if self.onOutput != None:
             self.onOutput(self.output)
         
-    def add(self, indexes):
-        i1,i2,i3 = indexes
+    def add(self, i1,i2,i3):
         self.write(i3, self.access(i1)+self.access(i2))
-        self.pointer += 4
 
-    def mult(self, indexes):
-        i1,i2,i3 = indexes
+    def mult(self, i1,i2,i3):
         self.write(i3, self.access(i1)*self.access(i2))
-        self.pointer += 4
 
-    def jit(self, indexes):
-        i1,i2 = indexes
+    def jit(self, i1,i2):
         
         if self.access(i1) != 0:
             self.pointer = self.access(i2)
-        else:
-            self.pointer += 3
 
-    def jif(self, indexes):
-        i1,i2 = indexes
+    def jif(self, i1,i2):
         
         if self.access(i1) == 0:
             self.pointer = self.access(i2)
-        else:
-            self.pointer += 3
             
-    def lt(self, indexes):
-        i1,i2,i3 = indexes
+    def lt(self, i1,i2,i3):
         if self.access(i1) < self.access(i2):
             self.write(i3, 1)
         else:
             self.write(i3, 0)
-        self.pointer += 4
 
-    def eq(self, indexes):
-        i1,i2,i3 = indexes
+    def eq(self, i1,i2,i3):
 
         if self.access(i1) == self.access(i2):
             self.write(i3, 1)
         else:
             self.write(i3, 0)
-        self.pointer += 4
 
-    def access(self, index):
+    def setRelativeBase(self,i1):
+        #print("setting relative base to",(self.relative_base+self.access(i1)),";",i1)
+        self.relative_base += self.access(i1)
+        
+    def access(self, index):        
+        while index >= len(self.data):
+            self.data.append([0])
+        #print("accessing",index,"got",self.data[index][0], "rel base",self.relative_base)
+        
         return self.data[index][0]
 
     def write(self, index, val):
+        while index >= len(self.data):
+            self.data.append([0])
         self.data[index][0] = val
 
     def receiveInput(self,value):
@@ -106,13 +105,16 @@ class Computer:
         
     def decodeParams(self, opcode, modes):
         ptr = self.pointer
+        #print("modes",modes, self.pointer)
         return [self.readModes[int(modes[x])](ptr+x+1) for x in range(self.paramCount[opcode])]        
     
     def execute(self,instruction):        
         instruction = str(instruction).rjust(5,"0")
         command = self.commands[int(instruction[-2:])]
         params = self.decodeParams(command, instruction[-3::-1])
-        command(params)
+        #print(instruction, command.__name__, params)
+        self.pointer += (self.paramCount[command]+1)
+        command(*params)        
 
     def run(self):
         while self.access(self.pointer) != 99:
