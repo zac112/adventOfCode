@@ -9,7 +9,7 @@ class Computer:
         self.input_data = {
             "data": program_input,
             "index": 0
-        }
+            }
         self.commands = {
             1:self.add,
             2:self.mult,
@@ -25,7 +25,7 @@ class Computer:
             0: lambda a: self.access(a),
             1: lambda a: a,
             2: lambda a: self.relative_base+self.access(a)
-        }
+            }
         self.paramCount={
             self.add:3,
             self.mult:3,
@@ -49,7 +49,6 @@ class Computer:
         self.write(i1,val)
 
     def output(self, i1):
-        #print("accessing index",i1)
         self.output = self.access(i1)
         if self.onOutput != None:
             self.onOutput(self.output)
@@ -60,13 +59,11 @@ class Computer:
     def mult(self, i1,i2,i3):
         self.write(i3, self.access(i1)*self.access(i2))
 
-    def jit(self, i1,i2):
-        
+    def jit(self, i1,i2):        
         if self.access(i1) != 0:
             self.pointer = self.access(i2)
 
-    def jif(self, i1,i2):
-        
+    def jif(self, i1,i2):        
         if self.access(i1) == 0:
             self.pointer = self.access(i2)
             
@@ -77,21 +74,17 @@ class Computer:
             self.write(i3, 0)
 
     def eq(self, i1,i2,i3):
-
         if self.access(i1) == self.access(i2):
             self.write(i3, 1)
         else:
             self.write(i3, 0)
 
     def setRelativeBase(self,i1):
-        #print("setting relative base to",(self.relative_base+self.access(i1)),";",i1)
         self.relative_base += self.access(i1)
         
     def access(self, index):        
         while index >= len(self.data):
-            self.data.append([0])
-        #print("accessing",index,"got",self.data[index][0], "rel base",self.relative_base)
-        
+            self.data.append([0])        
         return self.data[index][0]
 
     def write(self, index, val):
@@ -105,16 +98,14 @@ class Computer:
         
     def decodeParams(self, opcode, modes):
         ptr = self.pointer
-        #print("modes",modes, self.pointer)
         return [self.readModes[int(modes[x])](ptr+x+1) for x in range(self.paramCount[opcode])]        
     
     def execute(self,instruction):        
         instruction = str(instruction).rjust(5,"0")
         command = self.commands[int(instruction[-2:])]
         params = self.decodeParams(command, instruction[-3::-1])
-        #print(instruction, command.__name__, params)
         self.pointer += (self.paramCount[command]+1)
-        command(*params)        
+        command(*params)
 
     def run(self):
         while self.access(self.pointer) != 99:
