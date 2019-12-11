@@ -1,9 +1,10 @@
 class Computer:
         
-    def __init__(self, data, program_input=None, onFinished=None, onOutput=None):
+    def __init__(self, data, program_input=None, onFinished=None, onOutput=None, onInput=None):
         self.pointer = 0
         self.onFinished = onFinished
         self.onOutput = onOutput
+        self.onInput = onInput
         self.relative_base = 0
         
         self.input_data = {
@@ -40,11 +41,15 @@ class Computer:
         self.data = [[int(x)] for x in data]
 
     def read(self, i1):
-        if self.input_data["data"] == None:
-            val = int(input("Input value:"))
-        else:
+        if self.input_data["data"] != None and len(self.input_data["data"]) > self.input_data["index"]:
             val = self.input_data["data"][self.input_data["index"]]
             self.input_data["index"] += 1
+        elif self.onInput != None:
+            val = self.onInput()
+        elif self.input_data["data"] == None:
+            val = int(input("Input value:"))            
+        
+            
             
         self.write(i1,val)
 
@@ -93,8 +98,9 @@ class Computer:
         self.data[index][0] = val
 
     def receiveInput(self,value):
+        #print("received input",value)
         self.input_data["data"].append(value)
-        self.run()
+        #self.run()
         
     def decodeParams(self, opcode, modes):
         ptr = self.pointer
