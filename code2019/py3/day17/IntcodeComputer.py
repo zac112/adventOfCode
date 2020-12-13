@@ -49,7 +49,7 @@ class Computer:
         elif self.input_data["data"] == None:
             val = int(input("Input value:"))            
         
-            
+        print(chr(val))
             
         self.write(i1,val)
 

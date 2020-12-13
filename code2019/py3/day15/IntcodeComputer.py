@@ -40,14 +40,19 @@ class Computer:
             }
         self.data = [[int(x)] for x in data]
 
-    def read(self, i1):        
-        if self.input_data["data"] != None and len(self.input_data["data"]) > self.input_data["index"]:
-            val = self.input_data["data"][self.input_data["index"]]
-            self.input_data["index"] += 1
+    def read(self, i1):
+        if self.input_data["data"] != None:
+
+            if len(self.input_data["data"]) > self.input_data["index"]:            
+                val = self.input_data["data"][self.input_data["index"]]
+                self.input_data["index"] += 1
+            else:
+                self.running = False
+                return
         elif self.onInput != None:
             val = self.onInput()
         elif self.input_data["data"] == None:
-            val = int(input("Input value:"))            
+            val = int(input("Input value:"))
         
             
             
@@ -114,7 +119,8 @@ class Computer:
         command(*params)
 
     def run(self):
-        while self.access(self.pointer) != 99:
+        self.running = True
+        while self.access(self.pointer) != 99 and self.running:
             instruction = self.access(self.pointer)
             self.execute(instruction)
 
