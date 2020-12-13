@@ -108,6 +108,38 @@ data="""8
 ##12
 ##4"""
 
+##data = """28
+##33
+##18
+##42
+##31
+##14
+##46
+##20
+##48
+##47
+##24
+##23
+##49
+##45
+##19
+##38
+##39
+##11
+##1
+##32
+##25
+##35
+##8
+##17
+##7
+##9
+##4
+##2
+##34
+##10
+##3"""
+
 adapters = [int(x) for x in data.splitlines()]
 adapters.append(0)
 target = max(adapters)+3
@@ -122,18 +154,25 @@ for i, source in enumerate(adapters):
             adjacency.setdefault(source,[]).append(adapter)
             adjacency[source].sort()
 
-print(adjacency)
+[print(x) for x in sorted(adjacency.items(), key=lambda a:a[0])]
 
-
-count = [0]
-def search(source):
+memory = {}
+def search(source, memory):
+    paths = 1
     if target == source:
-        count[0] += 1
-        if (count[0]%1000000 ==0):
-            print(count)
-        return
-    for a in adjacency[source]:
-        search(a)
+        return paths
 
-search(0)
+    path = 0
+    for a in adjacency[source]:        
+        
+        if a not in memory:
+            memory[a] = search(a,memory)
+            print(len(adjacency)-len(memory))
+        path += memory[a]
+
+    paths *= path
+    
+    return paths
+
+count = search(0,memory)
 print(count)
