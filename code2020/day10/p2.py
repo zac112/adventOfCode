@@ -156,7 +156,6 @@ for i, source in enumerate(adapters):
 
 [print(x) for x in sorted(adjacency.items(), key=lambda a:a[0])]
 
-memory = {}
 def search(source, memory):
     paths = 1
     if target == source:
@@ -164,7 +163,6 @@ def search(source, memory):
 
     path = 0
     for a in adjacency[source]:        
-        
         if a not in memory:
             memory[a] = search(a,memory)
             print(len(adjacency)-len(memory))
@@ -174,5 +172,5 @@ def search(source, memory):
     
     return paths
 
-count = search(0,memory)
+count = search(0,{})
 print(count)
