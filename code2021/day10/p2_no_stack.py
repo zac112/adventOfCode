@@ -29,17 +29,14 @@ for line in lines:
     while (reline := re.sub('(\(\)|\[\]|\{\}|<>|\n)',"",line)) != line:
         line = reline
 
-    starts = "([{<"
-    ends = ")]}>"
-    error = False
-    for i,x in enumerate(starts):
-        for y in ends:
-            if x+y in line:
-                error = True
-                print("Syntax error: got",y,"expected",ends[i])
-                errors.append((y,ends[i]))
-                
-    if not error:
+    starts = "\(\[\{\<"
+    ends = "\)\]\}\>"
+    error = re.search("(["+starts+"])(["+ends+"])",line)
+    if error:
+        req,got = error.group(1),error.group(2)
+        print("Syntax error: got",got,"expected",req)
+        errors.append((got,req))
+    else:   
         autocomplete = list(map(lambda a:pairs[a],line[::-1]))
         print("Autocompleted line:","".join(autocomplete))
         autocomplete = list(map(lambda a:autocompleteMapping[a],autocomplete))                
