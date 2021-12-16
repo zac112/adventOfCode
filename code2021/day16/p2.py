@@ -10,7 +10,7 @@ binary = list(binary)
 class Literal():
     def __init__(self,val, version):
         self.val = int("".join(val),2)
-        self.version = int(version,2)
+        self.version = version
 
     def __repr__(self):
         version = self.version
@@ -26,7 +26,7 @@ class Literal():
 class Operator():
     def __init__(self,typeId, packets, version):
         self.id = typeId
-        self.version = int("".join(version),2)
+        self.version = version
         self.packets = packets
         
     def __repr__(self):
@@ -94,25 +94,25 @@ def parsePacket(binary):
 
     def parseLiteral():
         subpacket = []
-        while (t := readbits(binary,5))[0] == '1':
+        while (t := readbits(5))[0] == '1':
             subpacket += t[1:]
         subpacket += t[1:]
         return Literal(subpacket, version)
     
-    version = readbits(3)
-    packetType = int(readbits(3), base=2)
+    version = int(readbits(3), 2)
+    packetType = int(readbits(3), 2)
     if packetType==4:
         return parseLiteral()
     else:
         lengthID = readbits(1)
         packets = []
         if lengthID == '0':
-            subpacketLength = int(readbits(15),2)
+            subpacketLength = int(readbits(15), 2)
             subpacketbits = list(readbits(subpacketLength))
             while subpacketbits:
                 packets.append(parsePacket(subpacketbits))
         else:
-            subpackets = int(readbits(11),2)
+            subpackets = int(readbits(11), 2)
             for packet in range(subpackets):
                 packets.append(parsePacket(binary))
 
