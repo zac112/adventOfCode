@@ -100,7 +100,7 @@ def parsePacket(binary):
         return Literal(subpacket, version)
     
     version = readbits(3)
-    packetType = int(readbits(binary,3), base=2)
+    packetType = int(readbits(3), base=2)
     if packetType==4:
         return parseLiteral()
     else:
