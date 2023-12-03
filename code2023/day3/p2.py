@@ -7,12 +7,6 @@ class Number:
         self.coords = []
         self.id = num
 
-    def addDigit(self, digit):
-        self.digits.append(digit)
-
-    def addCoord(self, coord):
-        self.coords.append(coord)
-
     def getValue(self):
         if len(self.digits)==0: return 0
         return int("".join(self.digits))
@@ -24,35 +18,18 @@ class Number:
                     for y in [-1,0,1]
                     ])        
 
-    def isSymbol(self):
-        return False
-    
-    def isGear(self, diagram):
-        return False
-
-    def __hash__(self) -> int:
-        return self.id
-    
-    def __repr__(self):
-        return "".join(self.digits)
+    def addDigit(self, digit): self.digits.append(digit)
+    def addCoord(self, coord): self.coords.append(coord)
+    def isSymbol(self): return False    
+    def isGear(self, diagram): return False
+    def __hash__(self) -> int: return self.id    
+    def __repr__(self): return "".join(self.digits)
         
 class Symbol:
     def __init__(self, symbol, coord):
         self.numbers = []
         self.symbol = symbol
         self.coord = coord
-
-    def isSymbol(self):
-        return True
-    
-    def getValue(self):
-        return 0
-    
-    def isPartNumber(self, diagram):
-        return False
-    
-    def isGear(self, diagram):
-        return len(self.getNeighbors(diagram))==2
     
     def getNeighbors(self, diagram):
         cx,cy = self.coord
@@ -60,13 +37,16 @@ class Symbol:
                         for x in [-1,0,1] 
                         for y in [-1,0,1] 
                         if diagram.get((cx+x, cy+y),self).isPartNumber(diagram)
-                    )
+                    )   
     
-    def findRatio(self, diagram):
+    def findRatio(self, diagram): 
         return reduce(lambda a,b:a.getValue()*b.getValue(), self.getNeighbors(diagram))
-
-    def __repr__(self):
-        return self.symbol
+    
+    def isSymbol(self): return True    
+    def getValue(self): return 0    
+    def isPartNumber(self, diagram): return False    
+    def isGear(self, diagram): return len(self.getNeighbors(diagram))==2    
+    def __repr__(self): return self.symbol
 
 with open("data.txt") as f:
     data = f.readlines()

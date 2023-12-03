@@ -5,12 +5,6 @@ class Number:
         self.coords = []
         self.id = num
 
-    def addDigit(self, digit):
-        self.digits.append(digit)
-
-    def addCoord(self, coord):
-        self.coords.append(coord)
-
     def getValue(self):
         if len(self.digits)==0: return 0
         return int("".join(self.digits))
@@ -22,31 +16,21 @@ class Number:
                     for y in [-1,0,1]
                     ])  
 
-    def isSymbol(self):
-        return False
-
-    def __hash__(self) -> int:
-        return self.id
-    
-    def __repr__(self):
-        return "".join(self.digits)
+    def addDigit(self, digit): self.digits.append(digit)
+    def addCoord(self, coord): self.coords.append(coord)
+    def isSymbol(self): return False
+    def __hash__(self) -> int: return self.id    
+    def __repr__(self): return "".join(self.digits)
         
 class Symbol:
     def __init__(self, symbol):
         self.numbers = []
         self.symbol = symbol
 
-    def isSymbol(self):
-        return True
-    
-    def getValue(self):
-        return 0
-    
-    def isPartNumber(self, diagram):
-        return False
-    
-    def __repr__(self):
-        return self.symbol
+    def isSymbol(self): return True    
+    def getValue(self): return 0    
+    def isPartNumber(self, diagram): return False    
+    def __repr__(self): return self.symbol
 
 with open("data.txt") as f:
     data = f.readlines()
